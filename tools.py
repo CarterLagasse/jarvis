@@ -1,6 +1,6 @@
 """Jarvis abilities: local tools + Google Search grounding.
 
-Two tiers (see TOOLS.md):
+Two tiers:
 
 1. Local tools — no API, instant: clock/date, note-to-file, open URL.
    run_local_tool() executes them directly; the router never calls a model.

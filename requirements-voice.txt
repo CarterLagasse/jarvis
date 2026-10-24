@@ -18,10 +18,7 @@ yt-dlp
 # Keyless web providers (DDG, Open-Meteo, ESPN). Already in venv.
 httpx
 
-# HTTP for Zen /responses API uses stdlib only; httpx only needed for tests.
-# httpx
-
-# Offline alternative (also needs model files, see TTS.md):
+# Offline alternative (also needs model files, downloaded separately):
 # kokoro-onnx
 # soundfile
 

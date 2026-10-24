@@ -6,8 +6,8 @@ in "auto" mode):
   edge   — `pip install edge-tts` (free, best quality, needs net).
            Voice e.g. en-US-AriaNeural. MP3 decoded via `av` (already
            installed with faster-whisper).
-  kokoro — `pip install kokoro-onnx soundfile` + model files
-           (offline, Apache-2.0). See TTS.md for download paths.
+  kokoro — `pip install kokoro-onnx soundfile` + model files downloaded
+           from the kokoro-onnx GitHub release (offline, Apache-2.0).
   sapi   — `pip install pyttsx3` (Windows built-in voices, zero DL).
 
 Interface:
@@ -191,9 +191,9 @@ def _get_kokoro():
     v = next((p for p in search if p.exists() and p.suffix == ".bin"), None)
     if m is None or v is None:
         raise RuntimeError(
-            "Kokoro model files not found. See TTS.md: download "
-            "kokoro-v1.0.onnx + voices-v1.0.bin and set KOKORO_MODEL_PATH / "
-            "KOKORO_VOICES_PATH."
+            "Kokoro model files not found. Download kokoro-v1.0.onnx + "
+            "voices-v1.0.bin (kokoro-onnx GitHub releases / onnx-community "
+            "Hugging Face) and set KOKORO_MODEL_PATH / KOKORO_VOICES_PATH."
         )
     _KOKORO = Kokoro(str(m), str(v))
     return _KOKORO
@@ -244,7 +244,7 @@ def synthesize(text: str, engine: str | None = None,
         try:
             import kokoro_onnx  # noqa: F401
         except ImportError:
-            raise RuntimeError("pip install kokoro-onnx soundfile (see TTS.md)")
+            raise RuntimeError("pip install kokoro-onnx soundfile")
         return _synth_kokoro(text, voice)
     if eng == "sapi":
         _speak_sapi(text, voice)

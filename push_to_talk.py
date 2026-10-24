@@ -1,26 +1,28 @@
 """Jarvis voice assistant: hold hotkey to talk, release to send.
 
-Speech -> text (local faster-whisper) -> Gemini Flash-Lite router
-(see ROUTING.md) -> reply sink (internal queue + reply.txt tee) ->
+Speech -> text (local faster-whisper) -> router (router.py: local tool,
+keyless web, or step-up) -> reply sink (internal queue + reply.txt tee) ->
 local TTS (tts_local.py: edge/kokoro/sapi, no Gemini TTS).
 
 Press the hotkey again while it's speaking to interrupt. Esc quits.
 
 Install:
+  pip install -r requirements-voice.txt   # or the manual set below
   pip install faster-whisper sounddevice pynput numpy openai
   pip install edge-tts            (default voice, free, needs net)
   # offline voice alternative:
-  pip install kokoro-onnx soundfile   (+ model files, see TTS.md)
+  pip install kokoro-onnx soundfile   (+ model files, downloaded separately)
   # zero-download fallback on Windows:
   pip install pyttsx3
 
-Keys (see ARCHITECTURE.md for .env setup):
-  GEMINI_API_KEY    required (free tier) — base + flash/pro + search grounding
-  OPENROUTER_API_KEY  free Laguna coding model (or OPEN_ROUTER_API_KEY)
+Keys (copy `.env.example` to `.env` next to this file):
+  GEMINI_API_KEY       required (free tier) — base + search grounding
+  OPENROUTER_API_KEY   step-ups, "think harder"/"use ultra" (or OPEN_ROUTER_API_KEY)
 
-Abilities (see TOOLS.md): local tools (clock, notes, open URL) run with no
-API call; fresh-facts questions use Google Search grounding; everything
-else goes through the model router (see ROUTING.md).
+Abilities (tools.py + webtools.py): local tools (clock, notes, open URL) run
+with no API call; fresh-facts questions go to keyless web providers, with
+Google Search grounding as last resort; everything else goes through the
+model router (router.py).
 
 Usage:
   python push_to_talk.py [--no-speech] [--print-reply]
@@ -90,8 +92,7 @@ def _client_for(provider: str):
 def _require_gemini_key():
     if not os.environ.get("GEMINI_API_KEY"):
         sys.exit("GEMINI_API_KEY not found. Put it in a `.env` file next to "
-                 "push_to_talk.py (see .env.example) or export it first. "
-                 "See ARCHITECTURE.md.")
+                 "push_to_talk.py (see .env.example) or export it first.")
 
 
 _require_gemini_key()
@@ -120,7 +121,7 @@ recording = False
 # ---------------------------------------------------------------------------
 # Reply sink: LLM text -> speech_q (internal queue, primary) + reply.txt tee
 # + optional stdout (for `| python tts_local.py --stdin` piping).
-# TTS never sees the LLM; it only consumes this sink. (See ARCHITECTURE.md.)
+# TTS never sees the LLM; it only consumes this sink.
 # ---------------------------------------------------------------------------
 speech_q: queue.Queue = queue.Queue()  # (epoch, text-chunk)
 audio_q: queue.Queue = queue.Queue()  # (epoch, int16 audio, sample rate)
@@ -199,7 +200,7 @@ if SPEAK:
     eng = tts_local.resolve_engine(TTS_ENGINE)
     if eng is None:
         print("[warn] no local TTS engine installed; speech muted. "
-              "pip install edge-tts  (or kokoro-onnx / pyttsx3). See TTS.md.")
+              "pip install edge-tts (or kokoro-onnx + model files, or pyttsx3).")
         SPEAK = False
     else:
         print(f"[tts] engine={eng}")

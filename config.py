@@ -104,7 +104,7 @@ SYSTEM_PROMPT = (
 
 MAX_HISTORY_MESSAGES = int(os.environ.get("JARVIS_MAX_HISTORY", "20"))
 
-# Heuristic escalation thresholds (see router.py / ROUTING.md).
+# Heuristic escalation thresholds (see router.py).
 ESCALATE_KEYWORDS = tuple(
     os.environ.get(
         "JARVIS_ESCALATE_KEYWORDS",
@@ -117,7 +117,7 @@ ESCALATE_MIN_CHARS = int(os.environ.get("JARVIS_ESCALATE_MIN_CHARS", "220"))
 ESCALATE_HISTORY_DEPTH = int(os.environ.get("JARVIS_ESCALATE_DEPTH", "6"))
 
 # ---------------------------------------------------------------------------
-# Tools: local commands + Google Search grounding (see TOOLS.md)
+# Tools: local commands + Google Search grounding/quota (tools.py)
 # ---------------------------------------------------------------------------
 ENABLE_LOCAL_TOOLS = os.environ.get("JARVIS_TOOLS", "1") == "1"
 ENABLE_SEARCH_GROUNDING = os.environ.get("JARVIS_SEARCH", "1") == "1"

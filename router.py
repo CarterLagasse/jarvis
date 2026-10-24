@@ -6,7 +6,8 @@
 
 This module decides — WITHOUT an extra LLM call (saves latency + free
 quota) — when a transcript should step up, use a local tool, or take the
-Google Search grounded path. Full policy in ROUTING.md, tools in TOOLS.md.
+Google Search grounded path. Full policy: classify() and fallbacks_for()
+below; routing overview in the README.
 Pure heuristics + client factory, fail-closed.
 """
 from __future__ import annotations
@@ -38,7 +39,7 @@ def _norm(text: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Tool routing (see TOOLS.md). Checked BEFORE model routing in push_to_talk.
+# Tool routing. Checked BEFORE model routing in push_to_talk.
 # Order: local (instant) -> weather/sports (keyless APIs) -> web (DDG+Lite)
 # with Gemini grounding as last resort inside handle_text.
 # Returns (kind, detail) or (None, None).
@@ -247,7 +248,7 @@ def make_client(provider: str = "gemini"):
     return OpenAI(api_key=api_key, base_url=config.GEMINI_BASE_URL)
 
 
-# Model -> notes. Kept here so ROUTING.md and code can't drift apart.
+# Model -> notes. Kept here so routing docs and code can't drift apart.
 FREE_POOL = {
     "gemini direct": (config.LLM_MODEL, "base, free tier, ~15 RPM"),
     "gemini flash": (config.ESCALATION_MODEL_FLASH, "last-resort backup, 20/day cap"),
