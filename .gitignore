@@ -1,0 +1,16 @@
+# venv (folder named jarvis/)
+jarvis/
+
+# secrets & local state — never commit
+.env
+reply.txt
+notes.txt
+.search_quota.json
+
+# build junk
+__pycache__/
+*.pyc
+*.wav
+
+# OneDrive
+desktop.ini

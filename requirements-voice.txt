@@ -1,0 +1,29 @@
+# Jarvis voice assistant — base (already installed in jarvis/ venv) + TTS options.
+# Install a TTS backend: pick ONE to start (edge recommended).
+faster-whisper
+sounddevice
+pynput
+numpy
+openai
+
+# Default voice: free, best quality, needs internet.
+edge-tts
+
+# Google Search grounding + base/step-up models (already in venv).
+google-genai
+
+# Song resolution for "play ..." (resolves to YouTube Music autoplay links).
+yt-dlp
+
+# Keyless web providers (DDG, Open-Meteo, ESPN). Already in venv.
+httpx
+
+# HTTP for Zen /responses API uses stdlib only; httpx only needed for tests.
+# httpx
+
+# Offline alternative (also needs model files, see TTS.md):
+# kokoro-onnx
+# soundfile
+
+# Zero-download Windows fallback:
+# pyttsx3
