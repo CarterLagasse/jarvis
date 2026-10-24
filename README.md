@@ -1,8 +1,8 @@
 # Jarvis — Push-to-Talk Voice Assistant
 
 Hold a key, talk, release. Transcription runs locally, answers come from
-Gemini's free tier, and speech comes from a local TTS engine. No billing
-anywhere, no cloud TTS.
+Gemini's free tier (or whatever api you would like), and speech comes from 
+a local TTS engine. With default settings, there is no billing and no cloud TTS.
 
 ## Quickstart
 
@@ -55,7 +55,7 @@ All speech is local — Gemini TTS was removed. Pick an engine
 | Engine | Quality | Offline | Install |
 |--------|---------|---------|---------|
 | `edge` | Best free | No | `pip install edge-tts` |
-| `kokoro` | Very good | Yes | `pip install kokoro-onnx soundfile` + model files (see TTS.md) |
+| `kokoro` | Very good | Yes | `pip install kokoro-onnx soundfile` + model files (downloaded separately) |
 | `sapi` | Robotic, instant | Yes | `pip install pyttsx3` |
 | `none` | — | — | text-only |
 
