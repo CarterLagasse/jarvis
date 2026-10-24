@@ -7,8 +7,9 @@ anywhere, no cloud TTS.
 ## Quickstart
 
 ```
-pip install faster-whisper sounddevice pynput numpy openai
-pip install edge-tts            # default voice (free, needs net)
+pip install -r requirements-voice.txt   # STT, TTS, HTTP, song resolution
+# or the manual set:
+pip install faster-whisper sounddevice pynput numpy openai edge-tts
 
 copy .env.example .env          # then fill in GEMINI_API_KEY
 ```
@@ -34,8 +35,11 @@ Press the hotkey again while it speaks to interrupt. Esc quits.
 ```
 
 - **STT** is fully local (`base.en` Whisper, CUDA if available).
-- **LLM** is `gemini-3.5-flash-lite` by default, stepping up to
-  `gemini-3.5-flash` (code/reasoning) or `gemini-2.5-pro` ("think harder").
+- **LLM** is `gemini-3.5-flash-lite` by default. Complexity step-ups
+  (keywords, long prompts, retries, Gemini 429s) go to
+  `poolside/laguna-s-2.1:free` (OpenRouter, free); "think harder" → Laguna,
+  "use ultra" → `nvidia/nemotron-3-ultra-550b-a55b:free`. Every route has an
+  ordered backup chain; `gemini-3.5-flash` is last-resort quota backup only.
 - **Fresh facts** (weather, scores, news) come from keyless free APIs
   (Open-Meteo, ESPN, DuckDuckGo) — no quotas, no keys. Gemini search
   grounding is a last resort only.
@@ -79,7 +83,7 @@ no CLI flag for it. If PrintScreen misbehaves, set `JARVIS_HOTKEY=f9`.
 | Var | Required | Purpose |
 |-----|----------|---------|
 | `GEMINI_API_KEY` | yes | base + step-ups + search fallback (free tier) |
-| `OPENROUTER_API_KEY` | no | free Laguna coding model ("ask laguna", 429 shed) |
+| `OPENROUTER_API_KEY` | no | Laguna step-ups, "think harder"/"use ultra", backup chains |
 | `JARVIS_LOCATION` | no | default city for "what's the weather" (e.g. `Chicago`) |
 | `JARVIS_HOTKEY` | no | `printscreen` (default) / `f9` — `.env` only, no flag |
 | `JARVIS_TTS_ENGINE` | no | `auto` / `edge` / `kokoro` / `sapi` / `none` |
@@ -99,7 +103,28 @@ no CLI flag for it. If PrintScreen misbehaves, set `JARVIS_HOTKEY=f9`.
 | `webtools.py` | keyless providers (search, weather, scores) |
 | `tts_local.py` | local TTS engines, pipe consumer |
 
+## Stability & swapping APIs
+
+The piping is subject to change by design — routing, tool triggers, and TTS
+handling get rebuilt often, and no stage is a stable interface contract. The
+flip side: every seam is plain and swappable, so porting in whatever APIs
+you want is straightforward.
+
+- **LLM** — every call is an OpenAI-compatible `chat.completions` request
+  (`router.make_client`). All model IDs and base URLs are `.env`-overridable
+  (`JARVIS_LLM_MODEL`, `JARVIS_OPENROUTER_MODEL/_FAST/_BIG`,
+  `JARVIS_GEMINI_BASE_URL`, …) — point them at any OpenAI-style endpoint.
+- **Fresh facts / tools** — keyless plain-HTTP providers in `webtools.py`
+  (DuckDuckGo, Wikipedia, Open-Meteo, ESPN, BBC/NPR RSS); replace or extend.
+- **STT** — local faster-whisper; swap the model with `JARVIS_WHISPER_MODEL`.
+- **TTS** — engines sit behind one sink (`tts_local.py`, `--tts-engine`);
+  add one by following that pattern.
+
+Nothing here promises API stability — clone it, bend it, rebuild it.
+
 ## Further reading
+
+Kept locally, not committed to this repo:
 
 - `ROUTING.md` — model decision table, limits, failure policy
 - `TOOLS.md` — ability triggers, quotas, add-a-tool recipe

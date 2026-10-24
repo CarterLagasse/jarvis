@@ -142,7 +142,7 @@ SEARCH_QUOTA_FILE = os.environ.get(
 NOTES_FILE = os.environ.get("JARVIS_NOTES", "notes.txt")
 # Default location for weather (and later: local scores/news). Used when the
 # transcript names no city, before falling back to IP geolocation.
-# Examples: "Chicago", "New Haven, CT". Set in .env as JARVIS_LOCATION=...
+# Examples: "Chicago", "Boston, MA". Set in .env as JARVIS_LOCATION=...
 DEFAULT_LOCATION = os.environ.get("JARVIS_LOCATION", "").strip()
 
 # ---------------------------------------------------------------------------
